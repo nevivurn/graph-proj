@@ -10,8 +10,8 @@ class CustomGroup(pyglet.graphics.Group):
     '''
     To draw multiple 3D shapes in Pyglet, you should make a group for an object.
     '''
-    def __init__(self, transform_mat: Mat4, order):
-        super().__init__(order)
+    def __init__(self, joint, order, parent=None):
+        super().__init__(order, parent)
 
         '''
         Create shader program for each shape
@@ -20,26 +20,27 @@ class CustomGroup(pyglet.graphics.Group):
             shader.vertex_source_default, shader.fragment_source_default
         )
 
-        self.transform_mat = transform_mat
+        self.joint = joint
         self.indexed_vertices_list = None
         self.shader_program.use()
 
     def set_state(self):
         self.shader_program.use()
-        model = self.transform_mat
+        model = self.joint.get_transform()
         self.shader_program['model'] = model
 
     def unset_state(self):
+        self.joint.unset_trans()
         self.shader_program.stop()
 
     def __eq__(self, other):
         return (self.__class__ is other.__class__ and
                 self.order == other.order and
                 self.parent == other.parent)
-    
+
     def __hash__(self):
-        return hash((self.order)) 
-    
+        return hash((self.order))
+
 
 class Cube:
     '''
@@ -55,24 +56,24 @@ class Cube:
             0.5,0.5,-0.5,
             -0.5,0.5,-0.5]
         self.vertices = [scale[idx%3] * x for idx, x in enumerate(self.vertices)]
-    
+
         self.indices = [0, 1, 2, 2, 3, 0,
                     4, 7, 6, 6, 5, 4,
                     4, 5, 1, 1, 0, 4,
                     6, 7, 3, 3, 2, 6,
                     5, 6, 2, 2, 1, 5,
                     7, 4, 0, 0, 3, 7]
-    
+
         self.colors = (255, 0,  0,255,
                 0, 255,  0,255,
                 0,   0,255,255,
                 255,255,255,255,
-                
+
                 255, 0,  0,255,
                 0, 255,  0,255,
                 0,   0,255,255,
                 255,255,255,255)
-        
+
 class Sphere:
     '''
     default structure of sphere
@@ -132,11 +133,11 @@ class Sphere:
                     self.vertices.append(x2)
                     self.vertices.append(y2)
                     self.vertices.append(z2)
-                    
+
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)
-                
+
                 if (i != 0):
                     self.vertices.append(x2)
                     self.vertices.append(y2)
@@ -149,7 +150,7 @@ class Sphere:
                     self.vertices.append(x0)
                     self.vertices.append(y0)
                     self.vertices.append(z0)
-                    
+
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)
                     self.colors += (int(math.cos(phi0) * 255),int(math.cos(theta0) * 255),int(math.sin(phi0)*255),255)

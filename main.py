@@ -5,30 +5,33 @@ from render import RenderWindow
 from primitives import Cube,Sphere
 from control import Control
 
+from skel import Joint, CustomJoint
+
+import math
+
 
 if __name__ == '__main__':
     width = 1280
     height = 720
 
     # Render window.
-    renderer = RenderWindow(width, height, "Hello Pyglet", resizable = True)   
+    renderer = RenderWindow(width, height, "Hello Pyglet", resizable=True)
     renderer.set_location(200, 200)
 
     # Keyboard/Mouse control. Not implemented yet.
     controller = Control(renderer)
 
-    translate_mat1 = Mat4.from_translation(vector=Vec3(x=-2, y=0, z=0))
-    translate_mat2 = Mat4.from_translation(vector=Vec3(x=0, y=0, z=0))
-    translate_mat3 = Mat4.from_translation(vector=Vec3(x=2, y=0, z=0))
 
-    scale_vec = Vec3(x=1, y=1, z=1)
-
-    cube1 = Cube(scale_vec)
-    cube2 = Cube(Vec3(x=1.5, y=1.5, z=1.5))
-    sphere = Sphere(30,30)
-    renderer.add_shape(translate_mat1, cube1.vertices, cube1.indices, cube1.colors)
-    renderer.add_shape(translate_mat2, sphere.vertices, sphere.indices, sphere.colors)
-    renderer.add_shape(translate_mat3, cube2.vertices, cube1.indices, cube1.colors)
+    leg = Cube(Vec3(.5, 2, .5))
+    ball = Sphere(30, 30, scale=.0)
+    prev_joint = Joint(Mat4.from_translation(Vec3(0, -5, -3)), Mat4())
+    prev_ind = renderer.add_shape(prev_joint, leg.vertices, leg.indices, leg.colors)
+    for i in range(10):
+        leg = Cube(Vec3(.5, 2-i*.2, .5))
+        prev_joint = CustomJoint(Mat4.from_translation(Vec3(0, (2-i*.2)/2 + .3, 0)), Mat4(), 1/10, Vec3(0, 0, 1), prev_joint)
+        prev_ind = renderer.add_shape(prev_joint, ball.vertices, ball.indices, ball.colors, prev_ind)
+        prev_joint = Joint(Mat4.from_translation(Vec3(0, (2-i*.2)/2, 0)), Mat4(), prev_joint)
+        prev_ind = renderer.add_shape(prev_joint, leg.vertices, leg.indices, leg.colors, prev_ind)
 
     #draw shapes
     renderer.run()

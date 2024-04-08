@@ -1,3 +1,5 @@
+import math
+
 import pyglet
 from pyglet import window, app, shapes
 from pyglet.window import mouse,key
@@ -22,8 +24,8 @@ class RenderWindow(pyglet.window.Window):
         '''
         View (camera) parameters
         '''
-        self.cam_eye = Vec3(0,2,4)
-        self.cam_target = Vec3(0,0,0)
+        self.cam_eye = Vec3(-5,2,10)
+        self.cam_target = Vec3(0,1,0)
         self.cam_vup = Vec3(0,1,0)
         self.view_mat = None
         '''
@@ -48,12 +50,12 @@ class RenderWindow(pyglet.window.Window):
         # 1. Create a view matrix
         self.view_mat = Mat4.look_at(
             self.cam_eye, target=self.cam_target, up=self.cam_vup)
-        
-        # 2. Create a projection matrix 
+
+        # 2. Create a projection matrix
         self.proj_mat = Mat4.perspective_projection(
-            aspect = self.width/self.height, 
-            z_near=self.z_near, 
-            z_far=self.z_far, 
+            aspect = self.width/self.height,
+            z_near=self.z_near,
+            z_far=self.z_far,
             fov = self.fov)
 
     def on_draw(self) -> None:
@@ -64,21 +66,22 @@ class RenderWindow(pyglet.window.Window):
         view_proj = self.proj_mat @ self.view_mat
         for i, shape in enumerate(self.shapes):
             '''
-            Update position/orientation in the scene. In the current setting, 
+            Update position/orientation in the scene. In the current setting,
             shapes created later rotate faster while positions are not changed.
             '''
             if self.animate:
-                rotate_angle = dt
-                rotate_axis = Vec3(0,0,1)
-                rotate_mat = Mat4.from_rotation(angle = rotate_angle, vector = rotate_axis)
-                
-                shape.transform_mat @= rotate_mat
+                shape.joint.advance(dt)
+                #rotate_angle = math.pi/2 * math.sin(shape.joint.t)
+                #rotate_axis = Vec3(0,0,1)
+                #rotate_mat = Mat4.from_rotation(angle = rotate_angle, vector = rotate_axis)
+
+                #shape.joint.free_trans = rotate_mat
 
                 # # Example) You can control the vertices of shape.
                 # shape.indexed_vertices_list.vertices[0] += 0.5 * dt
 
             '''
-            Update view and projection matrix. There exist only one view and projection matrix 
+            Update view and projection matrix. There exist only one view and projection matrix
             in the program, so we just assign the same matrices for all the shapes
             '''
             shape.shader_program['view_proj'] = view_proj
@@ -89,12 +92,14 @@ class RenderWindow(pyglet.window.Window):
             aspect = width/height, z_near=self.z_near, z_far=self.z_far, fov = self.fov)
         return pyglet.event.EVENT_HANDLED
 
-    def add_shape(self, transform, vertice, indice, color):
-        
+    def add_shape(self, joint, vertice, indice, color, parent=None):
+
         '''
         Assign a group for each shape
         '''
-        shape = CustomGroup(transform, len(self.shapes))
+        if parent is not None:
+            parent = self.shapes[parent]
+        shape = CustomGroup(joint, len(self.shapes), parent)
         shape.indexed_vertices_list = shape.shader_program.vertex_list_indexed(len(vertice)//3, GL_TRIANGLES,
                         batch = self.batch,
                         group = shape,
@@ -102,9 +107,10 @@ class RenderWindow(pyglet.window.Window):
                         vertices = ('f', vertice),
                         colors = ('Bn', color))
         self.shapes.append(shape)
-         
+        return len(self.shapes)-1
+
     def run(self):
         pyglet.clock.schedule_interval(self.update, 1/60)
         pyglet.app.run()
 
-    
+
