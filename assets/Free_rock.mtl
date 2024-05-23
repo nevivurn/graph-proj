@@ -1,0 +1,7 @@
+newmtl Free_rock
+Ka 0.2 0.2 0.2
+map_Ka Free_rock_tex/Free_rock_Mixed_AO.jpg
+map_Kd Free_rock_tex/Free_rock_Base_Color.jpg
+map_Ks Free_rock_tex/Free_rock_Specular.jpg
+map_Ns Free_rock_tex/Free_rock_Roughness.jpg
+map_Bump Free_rock_tex/Free_rock_Normal_OpenGL.jpg
