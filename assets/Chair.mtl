@@ -1,0 +1,22 @@
+newmtl Chair
+Ka 1.000000 1.000000 1.000000
+Kd 0.930220 0.930220 0.930220
+Ks 0.500000 0.500000 0.500000
+map_Ka Chair/Chair_Mixed_AO.png
+map_Kd Chair/Chair_Base_color.png
+map_Ns Chair/Chair_Roughness.png
+map_Bump Chair/Chair_Normal.png
+
+newmtl Pillow_01
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+map_Kd Pillow_01/Pillow_01_Base_Color.jpg
+map_Bump Pillow_01/Pillow_01_Normal.jpg
+map_Ns Pillow_01/Pillow_01_Roughness.jpg
+
+newmtl Pillow_02
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+map_Kd Pillow_02/Pillow_02_Base_Color.jpg
+map_Bump Pillow_02/Pillow_02_Normal.jpg
+map_Ns Pillow_02/Pillow_02_Roughness.jpg
